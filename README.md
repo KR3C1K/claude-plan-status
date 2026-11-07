@@ -1,5 +1,7 @@
 # claude-plan-status
 
+**Polski** | [English](README.en.md)
+
 Mod do Claude Code, który pokazuje w linii statusu zużycie limitów planu Claude (Pro/Max), bieżący model i siłę myślenia:
 
 ![Linia statusu z modelem, siłą myślenia i zużyciem limitów 5h i tygodniowego](docs/statusline.png)
