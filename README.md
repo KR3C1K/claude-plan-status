@@ -32,12 +32,12 @@ W aplikacji desktop: kliknij + obok pola promptu → Plugins → Add marketplace
 
 ## Linia statusu (jednorazowo)
 
-Mod zapisuje gotowy wiersz do `~/.claude/plan-usage-status.txt`. Żeby wyświetlał się w natywnej linii statusu, dodaj do `~/.claude/settings.json`:
+Mod zapisuje gotowy wiersz do `~/.claude/plan-usage/<session_id>.txt` (osobno dla każdej sesji). Żeby wyświetlał się w natywnej linii statusu, dodaj do `~/.claude/settings.json`:
 
 ```json
 "statusLine": {
   "type": "command",
-  "command": "cat ~/.claude/plan-usage-status.txt 2>/dev/null"
+  "command": "f=~/.claude/plan-usage/$(sed -n 's/.*\"session_id\" *: *\"\\([^\"]*\\)\".*/\\1/p' | head -1).txt; cat \"$f\" 2>/dev/null"
 }
 ```
 

@@ -34,12 +34,12 @@ In the desktop app: click + next to the prompt box → Plugins → Add marketpla
 
 ## Status line (one-time setup)
 
-The mod writes the finished line to `~/.claude/plan-usage-status.txt`. To show it in Claude Code's native status line, add this to `~/.claude/settings.json`:
+The mod writes the finished line to `~/.claude/plan-usage/<session_id>.txt` (one file per session). To show it in Claude Code's native status line, add this to `~/.claude/settings.json`:
 
 ```json
 "statusLine": {
   "type": "command",
-  "command": "cat ~/.claude/plan-usage-status.txt 2>/dev/null"
+  "command": "f=~/.claude/plan-usage/$(sed -n 's/.*\"session_id\" *: *\"\\([^\"]*\\)\".*/\\1/p' | head -1).txt; cat \"$f\" 2>/dev/null"
 }
 ```
 

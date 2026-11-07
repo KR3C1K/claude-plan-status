@@ -46,10 +46,10 @@ const modelText = (model: string, level: string | null) =>
 // ANSI: kolor procentu, reszta przygaszona — tak jak w natywnej linii statusu.
 const ANSI = { green: '\x1b[32m', yellow: '\x1b[33m', red: '\x1b[31m', dim: '\x1b[2m', reset: '\x1b[0m' }
 
-const lineText = (model: string, level: string | null, limits: Limit[], now: number) => {
+const lineText = (model: string, level: string | null, limits: Limit[], now: number, probing: boolean) => {
   const d = (t: string) => `${ANSI.dim}${t}${ANSI.reset}`
   const parts = [d(modelText(model, level))]
-  if (limits.length === 0) parts.push(d('limity: brak odczytu'))
+  if (limits.length === 0) parts.push(d(probing ? 'limity: odczyt…' : 'limity: brak odczytu'))
   for (const l of limits) {
     const reset = untilReset(l.resetsAt, now)
     parts.push(
@@ -63,6 +63,8 @@ const lineText = (model: string, level: string | null, limits: Limit[], now: num
 
 export const register: Register = on => {
   let refreshNow: (() => Promise<void>) | undefined
+  // Trwa startowe zapytanie po świeże limity.
+  let probing = false
 
   on('session.start', async ($, e, next) => {
     await $.command.register({
@@ -80,11 +82,31 @@ export const register: Register = on => {
       // zapisujemy do pliku, który czyta natywna linia statusu (settings.json → statusLine).
       $.ui.status(undefined)
       const home = (await $.env.get('HOME')) ?? '/tmp'
-      await $.fs.write(`${home}/.claude/plan-usage-status.txt`, lineText(model, await read($, effort), limits, now))
+      const text = lineText(model, await read($, effort), limits, now, probing)
+      // Osobny plik na sesję: inaczej kilka otwartych sesji nadpisuje sobie
+      // nawzajem wiersz, a nowa sesja pokazuje stan z poprzedniej.
+      // Linia statusu wybiera plik po session_id, który dostaje na stdin.
+      const id = await $.session.id()
+      await $.fs.write(`${home}/.claude/plan-usage/${id}.txt`, text)
+      // Stary wspólny plik — dla konfiguracji statusLine sprzed tej zmiany.
+      await $.fs.write(`${home}/.claude/plan-usage-status.txt`, text)
     }
     refreshNow = refresh
 
-    await refresh()
+    // Limity przychodzą tylko w odpowiedzi API, więc przy starcie pytamy
+    // najtańszy model o jeden token, żeby od razu pokazać aktualne zużycie.
+    const probe = async () => {
+      probing = true
+      await refresh()
+      try {
+        await $.model.complete({ model: 'haiku', prompt: '.', maxTokens: 1, effort: 'low', timeoutMs: 20_000 })
+      } catch {
+        // Model zablokowany lub brak subskrypcji — zostaje „brak odczytu”.
+      }
+      probing = false
+      await refresh()
+    }
+    void probe()
     $.clock.every(PERIOD_MS, () => {
       void refresh()
     })
@@ -102,6 +124,13 @@ export const register: Register = on => {
       }
     }
     return yield* next(e)
+  })
+
+  // Silnik zgłasza zmianę limitów (np. po odpowiedzi API) — odśwież od razu.
+  on('session.measure', async ($, e, next) => {
+    const result = await next(e)
+    if (refreshNow && e.rateLimits.length > 0) await refreshNow()
+    return result
   })
 
   // Odśwież od razu po każdej turze: nowe limity i ewentualna zmiana /model.
