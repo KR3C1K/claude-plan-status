@@ -2,9 +2,7 @@
 
 Mod do Claude Code, który pokazuje w linii statusu zużycie limitów planu Claude (Pro/Max), bieżący model i siłę myślenia:
 
-```
-claude-opus-5-5 [medium] │ 5h 23% (reset za 2h 14m) │ Tydzień 41% (reset za 3d 5h)
-```
+![Linia statusu z modelem, siłą myślenia i zużyciem limitów 5h i tygodniowego](docs/statusline.png)
 
 - odświeżanie co 60 s i po każdej odpowiedzi modelu,
 - procenty w kolorze: zielony < 70%, żółty ≥ 70%, czerwony ≥ 90%,
