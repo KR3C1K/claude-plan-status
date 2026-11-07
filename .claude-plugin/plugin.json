@@ -1,1 +1,12 @@
-{ "name": "plan-usage", "version": "0.1.0", "description": "Shows Claude plan rate-limit usage (5h and weekly), current model and thinking effort in the status line", "license": "MIT", "types": "./types/index.d.ts" }
+{
+  "name": "plan-usage",
+  "version": "0.1.0",
+  "description": "Shows Claude plan rate-limit usage (5h and weekly), current model and thinking effort in the status line",
+  "license": "MIT",
+  "types": "./types/index.d.ts",
+  "author": {
+    "name": "KR3C1K",
+    "url": "https://github.com/KR3C1K"
+  },
+  "icon": "./.claude-plugin/icon.png"
+}

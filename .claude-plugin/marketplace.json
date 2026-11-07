@@ -1,5 +1,13 @@
 {
   "name": "claude-plan-status",
-  "owner": { "name": "KR3C1K" },
-  "plugins": [{ "name": "plan-usage", "source": "./" }]
+  "owner": {
+    "name": "KR3C1K"
+  },
+  "plugins": [
+    {
+      "name": "plan-usage",
+      "source": "./"
+    }
+  ],
+  "description": "Claude Code mod: plan rate-limit usage (5h and weekly), current model and thinking effort in the status line"
 }
