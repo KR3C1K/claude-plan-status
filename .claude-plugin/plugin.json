@@ -1,0 +1,1 @@
+{ "name": "plan-usage", "version": "0.1.0", "description": "Shows Claude plan rate-limit usage (5h and weekly), current model and thinking effort in the status line", "license": "MIT", "types": "./types/index.d.ts" }

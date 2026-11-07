@@ -1,0 +1,5 @@
+{
+  "name": "claude-plan-status",
+  "owner": { "name": "KR3C1K" },
+  "plugins": [{ "name": "plan-usage", "source": "./" }]
+}
